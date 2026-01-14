@@ -1,0 +1,30 @@
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Istok+Web:ital,wght@0,400;0,700;1,400;1,700&family=Libertinus+Math&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wdth,wght@0,75,300..800;1,75,300..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik+Mono+One&display=swap");
+
+.roboto {
+  font-family: "Roboto", sans-serif;
+  font-style: normal;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media screen and (max-width: 992px) {
+  .navbar-main-lg {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .nav-sm {
+    background-color: black;
+    clip-path: polygon(0% 0%, 60% 0%, 100% 100%, 0% 100%);
+  }
+}
+
+@media screen and (min-width: 767px) and (max-width: 992px) {
+  .nav-sm {
+    background-color: black;
+    clip-path: polygon(0% 0%, 50% 0%, 100% 100%, 0% 100%);
+  }
+}
