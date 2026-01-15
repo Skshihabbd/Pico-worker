@@ -1,24 +1,18 @@
-import useAuth from "../Hooks/useAuth";
+/* eslint-disable react/no-unescaped-entities */
+
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
-// import { Helmet } from "react-helmet-async";
-
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import SocialLogin from "./SocialLogin";
+import { toast, ToastContainer } from "react-toastify";
 import { RiLoader2Line } from "react-icons/ri";
+import useAuth from "../Hooks/useAuth";
+import SocialLogin from "./SocialLogin";
+import "react-toastify/dist/ReactToastify.css";
 
-// import Footer from "../../sharedcomponent/footer/Footer";
 const Login = () => {
   const { SignIn, users, loader, setLoader } = useAuth();
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  console.log(location);
-  const [success, setSuccess] = useState(null);
   const {
     register,
     handleSubmit,
@@ -26,103 +20,90 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    const email = data.email;
-    const password = data.password;
-    console.log(email, password);
-    SignIn(email, password)
-      .then((result) => {
-        console.log(result.user);
-        setSuccess(toast("login successfull"));
-
-        reset();
-        navigate(location?.state ? location.state : "/");
-      })
-      .catch((errores) => {
-        console.log(errores.message);
-        setError(toast("user Information is wrong"));
-        setLoader(false);
-      });
+  const onSubmit = async (data) => {
+    try {
+      await SignIn(data.email, data.password);
+      toast.success("Welcome back!");
+      reset();
+      navigate(location?.state || "/");
+    } catch (error) {
+      toast.error("Invalid credentials. Please try again.");
+      setLoader(false);
+    }
   };
+
   return (
-    <div className="  w-full h-screen roboto bg-gradient-to-r from-[#080807] via-[#7784b1]
-    to-[#000000] py-10 flex items-center justify-center relative">
-      {/* Optional: Helmet */}
-      {/* <Helmet><title>realstate | login</title></Helmet> */}
-      <div className="absolute inset-0 backdrop-blur-md bg-black/30 z-0"></div>
-      {/* Glassmorphism Login Box */}
-      <div className="lg:w-1/4 w-11/12 mx-auto my-8 bg-white/10 backdrop-blur-md shadow-xl rounded-xl border border-white/20">
-        <div className="w-full">
-          <SocialLogin />
-        </div>
-        <h1 className="text-center my-5 text-white font-bold roboto">
-          Login your account
-        </h1>
-        <hr className="w-5/6 mx-auto mb-6 border-white/30" />
-        <div className="px-8">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="h-16">
-              <label className="text-white roboto">Email</label>
-              <br />
-              <input
-                className="w-full text-white bg-opacity-0 bg-white placeholder:text-white text-black mb-1 h-10 outline-none border-2 border-white rounded-sm px-2 placeholder:text-sm"
-                type="email"
-                name="email"
-                required
-                placeholder="Enter email"
-                {...register("email", { required: true })}
-              />
-              {errors.email && (
-                <span className="text-white">This field is required</span>
-              )}
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#0f172a] relative overflow-hidden font-sans">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px]"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-600/20 rounded-full blur-[120px]"></div>
+
+      <div className="relative z-10 w-full max-w-md px-6">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl p-8">
+          
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-white tracking-tight">Welcome Back</h1>
+            <p className="text-slate-400 mt-2 text-sm">Please enter your details to sign in</p>
+          </div>
+
+          {/* Social Login Section */}
+          <div className="mb-6">
+            <SocialLogin />
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-white/10"></span></div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-[#1e293b] px-2 text-slate-500">Or continue with</span>
+              </div>
             </div>
-            <br />
-            <label htmlFor="passcode" className="text-white">
-              Password
-            </label>
-            <br />
-            <div className="h-16">
+          </div>
+
+          {/* Login Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5 ml-1">Email Address</label>
               <input
-                className="w-full bg-opacity-0 bg-white placeholder:text-white text-white mb-1 h-10 outline-none border-2 border-white rounded-sm px-2 placeholder:text-sm"
-                type="password"
-                name="password"
-                id="passcode"
-                required
-                placeholder="Enter password"
-                {...register("password", { required: true })}
+                type="email"
+                {...register("email", { required: "Email is required" })}
+                className={`w-full bg-white/5 border ${errors.email ? 'border-red-500' : 'border-white/10'} rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all`}
+                placeholder="name@company.com"
               />
-              {errors.password && (
-                <span className="text-white">This field is required</span>
-              )}
-              <p className="text-red-400">{error}</p>
+              {errors.email && <span className="text-xs text-red-400 mt-1 ml-1">{errors.email.message}</span>}
+            </div>
+
+            <div>
+              <div className="flex justify-between mb-1.5 ml-1">
+                <label className="block text-sm font-medium text-slate-300">Password</label>
+                <Link to="#" className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors">Forgot password?</Link>
+              </div>
+              <input
+                type="password"
+                {...register("password", { required: "Password is required" })}
+                className={`w-full bg-white/5 border ${errors.password ? 'border-red-500' : 'border-white/10'} rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all`}
+                placeholder="••••••••"
+              />
+              {errors.password && <span className="text-xs text-red-400 mt-1 ml-1">{errors.password.message}</span>}
             </div>
 
             <button
-              disabled={loader ||users}
-              className="w-full py-3 my-2  bg-green-600 text-white roboto"
+              disabled={loader || users}
+              className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-all duration-300 shadow-lg shadow-emerald-900/20 flex items-center justify-center mt-4"
             >
-              {loader ? (
-                <RiLoader2Line className="animate-spin mx-auto text-xl" />
-              ) : (
-                "Login"
-              )}
+              {loader ? <RiLoader2Line className="animate-spin text-2xl" /> : "Sign In"}
             </button>
           </form>
 
-          {users ? (
-            <p className="text-center text-green-500 pb-5 roboto">{success || 'successfully login'}</p>
-          ) : (
-            <p className="text-center text-white pb-5 roboto">
-              Dont have an account
-              <Link to="/register" className="text-green-500 ml-3">
-                Register
-              </Link>
-            </p>
-          )}
+          {/* Footer */}
+          <p className="text-center text-slate-400 mt-8 text-sm">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-emerald-400 font-medium hover:underline underline-offset-4">
+              Create an account
+            </Link>
+          </p>
         </div>
       </div>
-
-      <ToastContainer />
+      
+      <ToastContainer theme="dark" position="bottom-right" />
     </div>
   );
 };

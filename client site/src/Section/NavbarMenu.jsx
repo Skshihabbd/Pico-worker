@@ -11,8 +11,8 @@ const NavbarMenu = () => {
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "About Us", path: "/about" },
-    { name: "Contact", path: "/contact" },
+    { name: "Profile", path: "/profile" },
+    { name: "About Us", path: "/about-us" },
   ];
 
   return (

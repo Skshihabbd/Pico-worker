@@ -27,6 +27,7 @@ import TaskcreatorUpdate from "../../Dashboard/TaskcreatorUpdate";
 import TaskcreatorRoute from "./TaskcreatorRoute";
 import WorkerRoute from "./WorkerRoute";
 import DashboardRedirect from "../../Dashboard/DashboardRedirect";
+import About_Us from "../../page/About_Us";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <UserprofilePage></UserprofilePage>,
+      },
+      {
+        path: "about-us",
+        element:<About_Us/>,
       },
     ],
   },

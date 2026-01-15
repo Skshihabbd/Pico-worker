@@ -77,9 +77,9 @@ const DashBoardNavbar = () => {
               </div>
 
               <div className="relative group cursor-pointer">
-                {user?.photoURL ? (
+                {user?.image ? (
                   <img
-                    src={user.photoURL}
+                    src={user.image}
                     alt="profile"
                     className="w-10 h-10 rounded-full object-cover border-2 border-indigo-100 group-hover:border-indigo-500 transition-all shadow-sm"
                   />

@@ -1,23 +1,26 @@
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { IoEyeOff, IoEye } from "react-icons/io5";
-import useAuth from "../Hooks/useAuth";
+import { IoEyeOff, IoEye, IoCloudUploadOutline } from "react-icons/io5";
+import { RiLoader4Line } from "react-icons/ri";
 import axios from "axios";
-import SocialLogin from "./SocialLogin";
-import useAxiosPublic from "../Hooks2/useAxiosPublic";
 import Swal from "sweetalert2";
+import useAuth from "../Hooks/useAuth";
+import useAxiosPublic from "../Hooks2/useAxiosPublic";
+import SocialLogin from "./SocialLogin";
 
 const Registration = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { SignUp, updateUser, setLoader,users } = useAuth();
-  const [error, setError] = useState(" ");
-  const location = useLocation();
-  const navigate = useNavigate();
-  const axiosPublic = useAxiosPublic();
+  const { SignUp, updateUser, setLoader, users } = useAuth();
+  const [ setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [image, setImage] = useState(null);
-  const [imgShortName, setImgShortName] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [fileName, setFileName] = useState("");
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const axiosPublic = useAxiosPublic();
+
   const {
     register,
     handleSubmit,
@@ -28,315 +31,195 @@ const Registration = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-
     if (file) {
-      const fileName = file.name;
-
-      const shortName =
-        fileName.length > 5 ? fileName.slice(0, 7) + "..." : fileName;
-      setImgShortName(shortName);
-
-      const imageUrl = URL.createObjectURL(file);
-
-      console.log("imageurl", imageUrl);
-      setImage(imageUrl);
+      setFileName(file.name.length > 15 ? file.name.slice(0, 15) + "..." : file.name);
+      setImagePreview(URL.createObjectURL(file));
       setValue("photourl", e.target.files, { shouldValidate: true });
     }
   };
 
   const onSubmit = async (datas) => {
-    const email = datas.email;
-    const password = datas.password;
-    const name = datas.UserName;
-    const image = datas.photourl[0];
-    console.log("datas", datas);
-    const role = datas.role;
-    console.log("image", image);
+    const { email, password, UserName, role, photourl } = datas;
     const formData = new FormData();
-    formData.append("image", image);
-    console.log("this is form data", formData);
+    formData.append("image", photourl[0]);
 
     try {
       setLoading(true);
       const { data } = await axios.post(
-        "https://api.imgbb.com/1/upload?key=9c8539154be0bafb013ab02d1bbf342b",
+        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`,
         formData
       );
-      console.log("data paiche", data.data.display_url);
-      if (data) {
-        console.log("data paiche", data.data.display_url);
-        await SignUp(email, password);
-        await updateUser(name, data.data.display_url);
 
-        let Coin = role === "worker" ? 10 : 50;
+      if (data.success) {
+        const photoURL = data.data.display_url;
+        await SignUp(email, password);
+        await updateUser(UserName, photoURL);
 
         const userData = {
-          name,
+          name: UserName,
           email,
           role,
-          coin: Coin,
-          image: data.data.display_url,
+          coin: role === "worker" ? 10 : 50,
+          image: photoURL,
         };
 
         const res = await axiosPublic.post("/user", userData);
         if (res.data.insertedId) {
           Swal.fire({
-            position: "top-end",
             icon: "success",
-            title: "Account Created",
-            showConfirmButton: false,
-            timer: 1500,
+            title: "Welcome aboard!",
+            text: "Your account has been created successfully.",
+            background: "#1e293b",
+            color: "#fff",
+            confirmButtonColor: "#10b981",
           });
-
           reset();
-          setImage(null);
-          navigate(location?.state ? location.state : "/");
+          setImagePreview(null);
+          navigate(location?.state || "/");
         }
-
-        setLoading(false);
       }
     } catch (err) {
       setError(err.message);
       setLoader(false);
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div
-      className="relative h-screen grid place-items-center overflow-auto bg-gradient-to-r from-[#03071e] 
-    to-[#d18e8e] w-full"
-    >
-      <div className="md:w-3/4 lg:w-2/4 mx-auto border border-white/20 h-auto ">
-        <div className="flex justify-center">
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#0f172a] relative overflow-hidden py-12 px-4">
+      {/* Elegance Background Elements */}
+      <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px]"></div>
+      <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px]"></div>
+
+      <div className="relative z-10 w-full max-w-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl overflow-hidden">
+        <div className="p-8 lg:p-12">
+          {/* Header */}
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-bold text-white tracking-tight">Create Account</h1>
+            <p className="text-slate-400 mt-2">Join our community and start earning coins</p>
+          </div>
+
           <SocialLogin />
-        </div>
-        <p className="text-white roboto py-1 text-center">Or</p>
-        <h1 className="text-center mb-1 text-white roboto py-1">
-          Register your account
-        </h1>
-        <hr className="w-5/6 mx-auto mb-2" />
-        <div className="px-6">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex md:flex-row flex-col justify-between flex-wrap 
-            w-5/6 mx-auto gap-y-3"
-          >
-            {/* Name */}
-            <div className="md:w-[47%]">
-              <label htmlFor="text" className="text-white roboto">
-                Your name
-              </label>
-              <input
-                className="w-full text-white roboto bg-opacity-0 bg-white placeholder:text-white text-black mb-1 h-8 outline-none border-[1px] border-white rounded-sm placeholder:text-sm px-2"
-                type="text"
-                name="name"
-                id="texts"
-                placeholder="Enter your name"
-                {...register("UserName", { required: true })}
-              />
-              {errors.UserName && (
-                <span className="text-green-500 roboto">
-                  This field is required
-                </span>
-              )}
+
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-white/10"></span></div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-[#161f33] px-4 text-slate-500">Or register with email</span>
             </div>
+          </div>
 
-            {/* Email */}
-            <div className="md:w-[47%]">
-              <label htmlFor="email" className="text-white roboto">
-                Email
-              </label>
-              <input
-                className="w-full text-white roboto bg-opacity-0 bg-white placeholder:text-white text-black h-8 outline-none border-[1px] border-white rounded-sm px-2 placeholder:text-sm"
-                type="email"
-                name="email"
-                id="email"
-                required
-                placeholder="Enter email"
-                {...register("email", {
-                  required: "Email Address is required",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Please enter a valid email address",
-                  },
-                })}
-                onFocus={() => setError("")}
-              />
-              {errors.email && (
-                <span className="text-green-500 roboto">
-                  {errors.email.message}
-                </span>
-              )}
-              <p className="text-green-500 roboto">{error}</p>
-            </div>
-
-            {/* Image Upload */}
-            <div className="w-full flex justify-between items-end">
-              <div className={` ${image ? "md:w-[70%]" : "w-full"} `}>
-                <div>
-                  <label
-                    htmlFor="urll"
-                    className="block text-white roboto mb-2"
-                  >
-                    Photo
-                  </label>
-
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      name="url"
-                      onChange={handleImageChange}
-                      id="urll"
-                      className="peer absolute w-full h-full opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="flex w-full items-center justify-between px-4 py-2 bg-white/10 border border-white backdrop-blur-md text-white roboto cursor-pointer hover:bg-white/20 transition duration-200">
-                      <span className="peer-placeholder-shown:text-white text-sm">
-                        {image ? (
-                          <p className="text-sm text-white">{imgShortName}</p>
-                        ) : (
-                          " Upload image (JPG, PNG)"
-                        )}
-                      </span>
-                      <img className="w-5" src="upload.png" alt="" />
-                    </div>
-                  </div>
-
-                  {errors.photourl && (
-                    <span className="text-green-500 roboto mt-1 block">
-                      {errors.photourl.message}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Image Preview */}
-              <div
-                className={`h-10 md:h-20 md:w-3/12 border-2 ${
-                  image ? "" : "hidden"
-                } `}
-              >
-                <img
-                  src={image}
-                  alt="Preview"
-                  className="w-full h-full  object-cover rounded"
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Name */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-300 ml-1">Full Name</label>
+                <input
+                  {...register("UserName", { required: "Name is required" })}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all"
+                  placeholder="John Doe"
                 />
+                {errors.UserName && <p className="text-xs text-red-400 ml-1">{errors.UserName.message}</p>}
+              </div>
+
+              {/* Email */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-300 ml-1">Email Address</label>
+                <input
+                  {...register("email", { required: "Email is required" })}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all"
+                  placeholder="john@example.com"
+                />
+                {errors.email && <p className="text-xs text-red-400 ml-1">{errors.email.message}</p>}
+              </div>
+
+              {/* Role Select */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-300 ml-1">I want to be a...</label>
+                <select
+                  {...register("role", { required: "Please select a role" })}
+                  className="w-full bg-[#1e293b] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500/50 outline-none appearance-none cursor-pointer"
+                >
+                  <option value="" disabled selected>Select Role</option>
+                  <option value="worker">Worker (Earn Coins)</option>
+                  <option value="task creator">Task Creator (Post Tasks)</option>
+                </select>
+                {errors.role && <p className="text-xs text-red-400 ml-1">{errors.role.message}</p>}
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2 relative">
+                <label className="text-sm font-medium text-slate-300 ml-1">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    {...register("password", { 
+                        required: "Required",
+                        pattern: {
+                            value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
+                            message: "Uppercase, Lowercase, & Number required"
+                        }
+                    })}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                  >
+                    {showPassword ? <IoEye size={20} /> : <IoEyeOff size={20} />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-[10px] text-red-400 leading-tight">{errors.password.message}</p>}
               </div>
             </div>
-            {/* Role */}
-            <div className="md:w-[47%]">
-              <label htmlFor="urll" className="text-white roboto">
-                Role
-              </label>
-              <select
-                className="w-full roboto text-white bg-opacity-0 bg-black placeholder:text-white mb-1 h-8 rounded-full outline-none border-[1px] border-white rounded-sm px-2 placeholder:text-sm"
-                {...register("role", { required: "Please select a role" })}
-              >
-                <option disabled selected value="">
-                  Select your role
-                </option>
-                <option className="text-black" value="worker">
-                  Worker
-                </option>
-                <option className="text-black" value="task creator">
-                  Task creator
-                </option>
-              </select>
-              {errors.role && (
-                <span className="text-green-500">{errors.role.message}</span>
-              )}
-            </div>
 
-            {/* Password */}
-            <div className="relative md:w-[47%]">
-              <label htmlFor="passcode" className="text-white roboto">
-                Password
-              </label>
-              <input
-                className="w-full text-white roboto bg-opacity-0 bg-white placeholder:text-white text-black mb-1 h-8 outline-none border-[1px] border-white rounded-sm px-2 placeholder:text-sm"
-                type={showPassword ? "text" : "password"}
-                name="password"
-                id="passcode"
-                placeholder="Enter password"
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 8,
-                    message: "Password must be at least 8 characters",
-                  },
-                  maxLength: {
-                    value: 16,
-                    message: "Password must not exceed 16 characters",
-                  },
-                  pattern: {
-                    value:
-                      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
-                    message:
-                      "Password must have at least one uppercase, one lowercase, and one number",
-                  },
-                })}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-7 top-8"
-              >
-                {showPassword ? (
-                  <IoEye className="text-white text-lg" />
-                ) : (
-                  <IoEyeOff className="text-white text-lg" />
+            {/* Photo Upload Area */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300 ml-1">Profile Picture</label>
+              <div className="flex items-center gap-4">
+                <label className="flex-1 flex items-center justify-center gap-3 bg-white/5 border-2 border-dashed border-white/10 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all rounded-xl p-4 cursor-pointer group">
+                  <IoCloudUploadOutline className="text-slate-400 group-hover:text-emerald-400" size={24} />
+                  <span className="text-slate-400 group-hover:text-emerald-400 text-sm font-medium">
+                    {fileName || "Click to upload image"}
+                  </span>
+                  <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                </label>
+                {imagePreview && (
+                  <div className="w-16 h-16 rounded-xl border-2 border-emerald-500/50 overflow-hidden shrink-0">
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
                 )}
-              </button>
-              {errors.password && (
-                <span className="text-green-500">
-                  {errors.password.message}
-                </span>
-              )}
+              </div>
             </div>
 
-            {/* Checkbox */}
-            <div className="pt-5">
-              <input
-                type="checkbox"
-                name="checkbox"
-                id="check"
-                {...register("checkbook", { required: true })}
-              />
-              <label htmlFor="check" className="text-white mb-4 roboto">
-                Accept Term & Conditions
-              </label>
-              <br />
-              {errors.checkbook && (
-                <span className="text-green-500 roboto">
-                  This field is required
-                </span>
-              )}
-            </div>
+            {/* Terms */}
+            <label className="flex items-center gap-3 cursor-pointer group w-fit">
+              <div className="relative flex items-center">
+                <input
+                  type="checkbox"
+                  {...register("checkbook", { required: true })}
+                  className="peer appearance-none w-5 h-5 border border-white/20 rounded bg-white/5 checked:bg-emerald-500 checked:border-emerald-500 transition-all cursor-pointer"
+                />
+                <svg className="absolute w-3.5 h-3.5 hidden peer-checked:block left-[3px] text-white pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
+              </div>
+              <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">I accept the Terms & Conditions</span>
+            </label>
 
-            {/* Submit Button */}
             <button
               disabled={loading || users}
               type="submit"
-              className="w-full bg-white py-2 my-3 md:mt-3"
+              className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-900/20 transition-all transform active:scale-[0.98] flex items-center justify-center"
             >
-              {loading ? (
-                <img
-                  className="animate-spin w-7 mx-auto"
-                  src="loading.png"
-                  alt=""
-                />
-              ) : (
-                "Register"
-              )}
+              {loading ? <RiLoader4Line className="animate-spin text-2xl" /> : "Create My Account"}
             </button>
           </form>
 
-          {/* Login Redirect */}
-          <p className="text-center text-white roboto py-3">
-            Have an account
-            <Link to="/login" className="text-green-500 roboto pl-4">
-              Login
+          <p className="text-center text-slate-400 mt-8">
+            Already have an account?{" "}
+            <Link to="/login" className="text-emerald-400 font-semibold hover:text-emerald-300 transition-colors">
+              Log in here
             </Link>
           </p>
         </div>

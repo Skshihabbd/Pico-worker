@@ -65,7 +65,7 @@ const DashboardLayout = () => {
         {/* Sidebar Header & Close Button */}
         <div className="flex items-center justify-between px-6 py-6 border-b border-indigo-500/30">
           <h2 className="text-2xl font-bold tracking-tight italic">
-            <Link to="/">Task<span className="text-yellow-400">Flow</span></Link>
+            <Link to="/">Pico<span className="text-yellow-400">Worker</span></Link>
           </h2>
           <button
             onClick={() => setOpen(false)}

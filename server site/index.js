@@ -10,14 +10,14 @@ const cookieParser = require("cookie-parser");
 
 // middleware
 const corsOptions = {
-  origin: ["http://localhost:5173"],
+  origin: ["http://localhost:5173","https://pico-worker.vercel.app"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   withCredentials: true,
 };
 
 app.use(cors());
 
-// app.use(cors());
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -160,7 +160,7 @@ async function run() {
 
     // withdrwacollection api
 
-    app.get("/alluser",  verifyAdmin, async (req, res) => {
+    app.get("/alluser",  async (req, res) => {
       //  console.log(req.query)
 
       const users = await userData.find().toArray();
@@ -252,7 +252,7 @@ async function run() {
     });
     // submission worker home sun of approved payable amount
     // worker home
-    app.get("/usere", verifyAdmin, async (req, res) => {
+    app.get("/usere",  async (req, res) => {
       console.log(req.query);
       let query = {};
       if (req.query?.role) {
