@@ -5,7 +5,6 @@ import { FaTasks, FaWallet, FaShieldAlt, FaTrophy } from "react-icons/fa";
 import Testimonial from "../Section/Homesection/Testimonial";
 import TopEarner from "../Section/Homesection/TopEarner";
 import Footer from "../Section/Footer";
-import MyPage from "../Section/Homesection/MyPage";
 
 const Home = () => {
   const axiosSecure = useAxiosSecure();
@@ -124,10 +123,8 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-8">
-            {homepagedata.slice(0, 6).map((info) => (
-              <TopEarner key={info._id} info={info} />
-            ))}
+          <div>
+          <TopEarner info={homepagedata}/>
           </div>
         </div>
 
@@ -136,11 +133,7 @@ const Home = () => {
           <Testimonial />
         </div>
 
-        {/* test */}
-        <div>
-          <MyPage />
-        </div>
-        {/* test */}
+       
         {/* footer */}
         <div>
           <Footer />

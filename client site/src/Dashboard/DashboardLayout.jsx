@@ -63,7 +63,7 @@ const DashboardLayout = () => {
         {/* Header */}
         <div className="flex items-center justify-between px-6 h-16 border-b border-indigo-500/30">
           <Link
-            to="/"
+            to="/dashboard"
             className="text-xl font-bold italic tracking-tight"
           >
             Pico<span className="text-yellow-400">Worker</span>
