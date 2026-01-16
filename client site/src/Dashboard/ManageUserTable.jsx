@@ -55,7 +55,7 @@ const ManageUserTable = ({ info, fetch, idx }) => {
       <td className="text-center font-bold text-slate-400 w-12">{idx + 1}</td>
       
       {/* User Info - Min Width added for mobile readability */}
-      <td className="min-w-[200px]">
+      <td className="">
         <div className="flex items-center gap-3 md:gap-4">
           <div className="avatar shrink-0">
             <div className="mask mask-squircle w-10 h-10 md:w-12 md:h-12 ring-2 ring-indigo-50">
@@ -74,7 +74,7 @@ const ManageUserTable = ({ info, fetch, idx }) => {
       </td>
 
       {/* Contact & Coins - Min Width added */}
-      <td className="min-w-[180px]">
+      <td className="">
         <div className="text-slate-600 font-medium text-xs md:text-sm truncate max-w-[150px] md:max-w-none">
             {email}
         </div>
@@ -85,7 +85,7 @@ const ManageUserTable = ({ info, fetch, idx }) => {
       </td>
 
       {/* Role Management */}
-      <td className="min-w-[150px]">
+      <td className="">
         <div className="dropdown dropdown-end md:dropdown-right">
           <label tabIndex={0} className="btn btn-xs md:btn-sm bg-white border-slate-200 hover:bg-slate-50 text-indigo-600 normal-case rounded-lg md:rounded-xl gap-2 shadow-sm shrink-0">
             <FaUserEdit /> <span className="hidden xs:inline">Role</span>

@@ -32,167 +32,94 @@ import About_Us from "../../page/About_Us";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Main></Main>,
-    errorElement: <ErrorPage></ErrorPage>,
+    element: <Main />,
+    errorElement: <ErrorPage />,
     children: [
-      { path: "/", element: <Home></Home> },
-      {
-        path: "profile",
-        element: <UserprofilePage></UserprofilePage>,
-      },
-      {
-        path: "about-us",
-        element:<About_Us/>,
-      },
+      { index: true, element: <Home /> }, // path: "/" er bodole index: true better
+      { path: "profile", element: <UserprofilePage /> },
+      { path: "about-us", element: <About_Us /> },
     ],
   },
-  { path: "login", element: <Login/> },
-  {
-    path: "register",
-    element: <Registration></Registration>,
-  },
+  { path: "login", element: <Login /> },
+  { path: "register", element: <Registration /> },
   {
     path: "dashboard",
-    
-    element: <DashboardLayout></DashboardLayout>,
+    element: (
+      <PrivetRoute> 
+        <DashboardLayout />
+      </PrivetRoute>
+    ),
     children: [
+      { index: true, element: <DashboardRedirect /> },
 
-       {
-      index: true,
-      element: <DashboardRedirect />, 
-    },
+      // Admin Routes
       {
         path: "adminhome",
-        element: (
-          <AdminRouter>
-            <AdminHome></AdminHome>
-          </AdminRouter>
-        ),
+        element: <AdminRouter><AdminHome /></AdminRouter>
       },
       {
         path: "manageuser",
-        element: (
-          <PrivetRoute>
-            <AdminRouter>
-              <ManageUsers></ManageUsers>
-            </AdminRouter>
-          </PrivetRoute>
-        ),
+        element: <AdminRouter><ManageUsers /></AdminRouter>
       },
-
       {
         path: "managetask",
-        element: (
-          <PrivetRoute>
-            <AdminRouter>
-              <Managetask></Managetask>
-            </AdminRouter>
-          </PrivetRoute>
-        ),
+        element: <AdminRouter><Managetask /></AdminRouter>
       },
+
+      // Task Creator Routes
       {
         path: "creatorhome",
-        element: (
-          <TaskcreatorRoute>
-            <TaskCreatorHome></TaskCreatorHome>
-          </TaskcreatorRoute>
-        ),
+        element: <TaskcreatorRoute><TaskCreatorHome /></TaskcreatorRoute>
       },
       {
         path: "addnewtask",
-        element: (
-          <PrivetRoute>
-            <TaskcreatorRoute>
-              <AddNewtask></AddNewtask>
-            </TaskcreatorRoute>
-          </PrivetRoute>
-        ),
+        element: <TaskcreatorRoute><AddNewtask /></TaskcreatorRoute>
       },
       {
         path: "mytask",
-        element: (
-          <PrivetRoute>
-            <TaskcreatorRoute>
-              <Mytasks></Mytasks>
-            </TaskcreatorRoute>
-          </PrivetRoute>
-        ),
-      },
-      {
-        path: "purchasecoin",
-        element: (
-          <TaskcreatorRoute>
-            <PurchaseCoin></PurchaseCoin>
-          </TaskcreatorRoute>
-        ),
-      },
-      {
-        path: "paymenthistory",
-        element: (
-          <TaskcreatorRoute>
-            <PaymentHistory></PaymentHistory>
-          </TaskcreatorRoute>
-        ),
-      },
-      {
-        path: "workerhome",
-        element: (
-          <WorkerRoute>
-            <WorkerHome></WorkerHome>
-          </WorkerRoute>
-        ),
-      },
-      {
-        path: "tasklist",
-        element: (
-          <WorkerRoute>
-            <TaskList></TaskList>
-          </WorkerRoute>
-        ),
-      },
-      {
-        path: "taskdetails/:id",
-        element: (
-          <WorkerRoute>
-            <TaskDetails></TaskDetails>
-          </WorkerRoute>
-        ),
-        loader: ({ params }) =>
-          fetch(
-            `https://server-side-nu-sooty.vercel.app/taskcreatorsall/${params.id}`
-          ),
-      },
-      {
-        path: "mysubmission",
-        element: (
-          <WorkerRoute>
-            <MySubmission></MySubmission>
-          </WorkerRoute>
-        ),
-      },
-      {
-        path: "withdraw",
-        element: (
-          <WorkerRoute>
-            <WithDrawals></WithDrawals>
-          </WorkerRoute>
-        ),
-      },
-      {
-        path: "paymentroute/:coin/:price",
-        element: <PaymentRoute></PaymentRoute>,
+        element: <TaskcreatorRoute><Mytasks /></TaskcreatorRoute>
       },
       {
         path: "taskupdate/:id",
-        element: (
-          <TaskcreatorRoute>
-            <TaskcreatorUpdate></TaskcreatorUpdate>
-          </TaskcreatorRoute>
-        ),
-        loader: ({ params }) =>
-          fetch(
-            `https://server-side-nu-sooty.vercel.app/taskcreatorsall/${params.id}`
-          ),
+        element: <TaskcreatorRoute><TaskcreatorUpdate /></TaskcreatorRoute>,
+        loader: ({ params }) => fetch(`https://server-side-nu-sooty.vercel.app/taskcreatorsall/${params.id}`)
+      },
+      {
+        path: "purchasecoin",
+        element: <TaskcreatorRoute><PurchaseCoin /></TaskcreatorRoute>
+      },
+      {
+        path: "paymenthistory",
+        element: <TaskcreatorRoute><PaymentHistory /></TaskcreatorRoute>
+      },
+
+      // Worker Routes
+      {
+        path: "workerhome",
+        element: <WorkerRoute><WorkerHome /></WorkerRoute>
+      },
+      {
+        path: "tasklist",
+        element: <WorkerRoute><TaskList /></WorkerRoute>
+      },
+      {
+        path: "taskdetails/:id",
+        element: <WorkerRoute><TaskDetails /></WorkerRoute>,
+        loader: ({ params }) => fetch(`https://server-side-nu-sooty.vercel.app/taskcreatorsall/${params.id}`)
+      },
+      {
+        path: "mysubmission",
+        element: <WorkerRoute><MySubmission /></WorkerRoute>
+      },
+      {
+        path: "withdraw",
+        element: <WorkerRoute><WithDrawals /></WorkerRoute>
+      },
+
+      // Common Private Routes
+      {
+        path: "paymentroute/:coin/:price",
+        element: <PaymentRoute />
       },
     ],
   },
